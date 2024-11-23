@@ -1,0 +1,51 @@
+version: '3.8'
+services: # First App (App 1)
+  app1:
+    build: ./backend   # Adjust to your directory where the first app's Dockerfile is located
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo1
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo1:27017/admin
+      - JWT_SECRET= <jwt-secret-key>
+      - EMAIL_USER=<email-user>
+      - EMAIL_PASS=<email-password>
+      - EMAIL_SERVICE=gmail
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  mongo1:   # MongoDB for App 1
+    image: mongo:latest
+    ports:
+      - "27017:27017"  # Port for App 1 MongoDB
+    volumes:
+      - mongo-data:/data/db
+  # Second App (App 2)
+  app2:
+    build: ./Userbackend  # Adjust to your directory where the second app's Dockerfile is located
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo2
+    environment:
+      - NODE_ENV=development
+      - PORT=5001
+      - MONGO_URI=mongodb://mongo1:27017/admin
+      - JWT_SECRET= <jwt-secret-key>
+      - EMAIL_USER=<email-user>
+      - EMAIL_PASS=<email-password>
+      - EMAIL_SERVICE=gmail
+    volumes:
+      - ./Userbackend:/app
+      - /app/node_modules
+  mongo2:  # MongoDB for App 2
+    image: mongo:latest
+    ports:
+      - "4000:27017"  # Port for App 2 MongoDB
+    volumes:
+      - another-mongo-data:/data/db
+volumes:
+  mongo-data:       # Volume for App 1 MongoDB
+  another-mongo-data:  # Volume for App 2 MongoDB
